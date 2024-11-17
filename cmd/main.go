@@ -38,4 +38,15 @@ func main() {
 		todos = append(todos, todo)
 		w.WriteHeader(http.StatusCreated)
 	})
+
+	r.Get("/todos", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		err := json.NewEncoder(w).Encode(todos)
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("Internal server error"))
+			return
+		}
+	})
 }
