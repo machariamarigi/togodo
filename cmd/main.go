@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -13,6 +14,7 @@ type Todo struct {
 }
 
 func main() {
+	todos := []Todo{}
 
 	r := chi.NewRouter()
 
@@ -20,5 +22,20 @@ func main() {
 
 	r.Get("/healthcheck", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("OK"))
+	})
+
+	r.Post("/todos", func(w http.ResponseWriter, r *http.Request) {
+		todo := Todo{}
+
+		err := json.NewDecoder(r.Body).Decode(&todo)
+
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("Invalid request body"))
+			return
+		}
+
+		todos = append(todos, todo)
+		w.WriteHeader(http.StatusCreated)
 	})
 }
